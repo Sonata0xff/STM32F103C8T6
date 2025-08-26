@@ -10,13 +10,14 @@ int main()
 		.GPIO_Mode = GPIO_Mode_Out_PP
 	};
 	GPIO_Init(GPIOA, &gpioa);
-	GPIO_SetBits(GPIOA, GPIO_Pin_0);
-	TimerInit();
+	GPIO_ResetBits(GPIOA, GPIO_Pin_0);
+	//TimerInit();
+	TimerInitWithOutIT();
 	while(1) {
-		GPIO_ResetBits(GPIOA, GPIO_Pin_0);
-		Delay_xus(6);
 		GPIO_SetBits(GPIOA, GPIO_Pin_0);
-		Delay_xus(4);
+		Delay_xus_wit(1);
+		GPIO_ResetBits(GPIOA, GPIO_Pin_0);
+		Delay_xus_wit(1);
 	};
 	return 0;
 }
