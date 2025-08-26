@@ -74,7 +74,7 @@ void TimerInitWithOutIT(void) // this delay func dosen't need it
 	TIM2->EGR |= 0x0001;// pack config into register
 }
 
-void Delay_xus_wit(uint16_t us) // delay have to be bigger than 0 us, then is accurate, but this still has +0.4~+0.5 us error
+void Delay_xus_wit(uint16_t us) // delay have to be bigger than 0 us, then is accurate, but this still has +0.1~+0.3 us error
 {
 	TIM2->PSC = 72-1;// reset prescaler to us
 	TIM2->ARR = us-1;// set delay time
