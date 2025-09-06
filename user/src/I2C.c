@@ -15,7 +15,7 @@ void IIC_Init(GPIO_TypeDef* GPIOx, uint16_t SCL_, uint16_t SDA_)
 	GPIO_InitTypeDef gpio_scl = {
 		.GPIO_Pin = SCL,
 		.GPIO_Speed = GPIO_Speed_50MHz,
-		.GPIO_Mode = GPIO_Mode_Out_OD
+		.GPIO_Mode = GPIO_Mode_Out_PP
 	};
 	GPIO_InitTypeDef gpio_sda = {
 		.GPIO_Pin = SDA,
@@ -39,6 +39,7 @@ void StartFunc()
 
 void EndFunc()
 {
+	Delay_xus_wit(5);
 	GPIO_SetBits(gpiox, SCL);
 	Delay_xus_wit(4);
 	GPIO_SetBits(gpiox, SDA);

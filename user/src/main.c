@@ -1,23 +1,14 @@
 #include "stm32f10x.h"                  // Device header
 #include "timer.h"
+#include "I2C.h"
 int main()
 {
-	
+	unsigned char tmp = 0xad;
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-	GPIO_InitTypeDef gpioa = {
-		.GPIO_Pin = GPIO_Pin_0,
-		.GPIO_Speed = GPIO_Speed_50MHz,
-		.GPIO_Mode = GPIO_Mode_Out_PP
-	};
-	GPIO_Init(GPIOA, &gpioa);
-	GPIO_ResetBits(GPIOA, GPIO_Pin_0);
-	//TimerInit();
-	TimerInitWithOutIT();
-	while(1) {
-		GPIO_SetBits(GPIOA, GPIO_Pin_0);
-		Delay_xus_wit(4);
-		GPIO_ResetBits(GPIOA, GPIO_Pin_0);
-		Delay_xus_wit(4);
-	};
+	IIC_Init(GPIOA, GPIO_Pin_0, GPIO_Pin_1);
+	StartFunc();
+	MainSend1Byte(tmp);
+	EndFunc();
+	while(1);
 	return 0;
 }
