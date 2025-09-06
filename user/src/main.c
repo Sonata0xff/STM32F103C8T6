@@ -15,9 +15,9 @@ int main()
 	TimerInitWithOutIT();
 	while(1) {
 		GPIO_SetBits(GPIOA, GPIO_Pin_0);
-		Delay_xus_wit(1);
+		Delay_xus_wit(4);
 		GPIO_ResetBits(GPIOA, GPIO_Pin_0);
-		Delay_xus_wit(1);
+		Delay_xus_wit(4);
 	};
 	return 0;
 }
