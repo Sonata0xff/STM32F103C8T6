@@ -1,0 +1,32 @@
+1.I2C.h模块：
+(1)模块工作方法：
+    1.指定gpio口为SCL与SDA，并使用这两个端口进行I2C通信
+    2.其中SCL配置为推挽输出以确保时钟准确
+    3.SDA为开漏上拉输出
+    4.目前仅实现单片机为主机的通讯过程，通信的时钟由主机控制
+(2)函数讲解：
+    一、基础函数
+        1.IIC_Init：指定两个端口来设置为SCL与SDA，但是初始化过程不包括APB初始化，在玉兴该函数前需要先运行APB总线初始化
+        2.StartFunc：主机开始标志
+        3.EndFunc：主机结束通讯标志
+    
+    二、主机发送相关：
+        1.MainSend1Bit：主机发送1bit数据
+        2.SlaveRecAck：读取从机回复的Ack
+        3.MainSend1Byte：主机发送1Byte数据，并接受从机的Ack
+    主机发送流程实例：
+        StartFunc开始通讯
+        MainSend1Byte发送1Byte数据，指定从机地址
+        MainSend1Byte向从机发送1byte数据
+        EndFunc结束通讯
+    
+    三、从机发送相关：
+        1.SlaveSend1Bit：从机向主机发送1bit数据
+        2.MainRecAck：主机向从机发送Ack
+        3.SlaveSend1Byte：从机向主机发送1Byte数据，并且主机返回Ack
+    从机发送流程实例：
+        StartFunc开始通讯
+        MainSend1Byte发送1Byte数据，指定从机地址
+        MainSend1Byte向从机发送1Byte数据，指定读取数据
+        SlaveSend1Byte从机向主机发送1Byte数据
+        EndFunc结束通讯
