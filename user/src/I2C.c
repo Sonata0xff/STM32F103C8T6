@@ -2,6 +2,9 @@
 
 #define NULL 0
 
+#define FIST_DELAY 3
+#define SECOND_DELAY 2
+
 GPIO_TypeDef* gpiox = NULL;
 uint16_t SCL = 0;
 uint16_t SDA = 0;
@@ -31,26 +34,26 @@ void IIC_Init(GPIO_TypeDef* GPIOx, uint16_t SCL_, uint16_t SDA_)
 }
 void StartFunc()
 {
-	Delay_xus_wit(5);
+	Delay_xus_wit(FIST_DELAY);
 	GPIO_ResetBits(gpiox, SDA);
-	Delay_xus_wit(4);
+	Delay_xus_wit(SECOND_DELAY);
 	GPIO_ResetBits(gpiox, SCL);
 }
 
 void EndFunc()
 {
-	Delay_xus_wit(5);
+	Delay_xus_wit(FIST_DELAY);
 	GPIO_SetBits(gpiox, SCL);
-	Delay_xus_wit(4);
+	Delay_xus_wit(SECOND_DELAY);
 	GPIO_SetBits(gpiox, SDA);
 }
 
 void MainSend1Bit(unsigned char bit)
 {
 	if (bit) GPIO_SetBits(gpiox, SDA);
-	Delay_xus_wit(5);
+	Delay_xus_wit(FIST_DELAY);
 	GPIO_SetBits(gpiox, SCL);
-	Delay_xus_wit(4);
+	Delay_xus_wit(SECOND_DELAY);
 	GPIO_ResetBits(gpiox, SCL);
 	GPIO_ResetBits(gpiox, SDA);
 }
@@ -59,10 +62,10 @@ unsigned char SlaveRecAck()
 {
 	unsigned char res;
 	GPIO_SetBits(gpiox, SDA);
-	Delay_xus_wit(5);
+	Delay_xus_wit(FIST_DELAY);
 	GPIO_SetBits(gpiox, SCL);
 	res = GPIO_ReadInputDataBit(gpiox, SDA);
-	Delay_xus_wit(4);
+	Delay_xus_wit(SECOND_DELAY);
 	GPIO_ResetBits(gpiox, SCL);
 	GPIO_ResetBits(gpiox, SDA);
 	return res;
@@ -82,10 +85,10 @@ unsigned char SlaveSend1Bit()
 {
 	unsigned char res;
 	GPIO_SetBits(gpiox, SDA);
-	Delay_xus_wit(5);
+	Delay_xus_wit(FIST_DELAY);
 	GPIO_SetBits(gpiox, SCL);
 	res = GPIO_ReadInputDataBit(gpiox, SDA);
-	Delay_xus_wit(4);
+	Delay_xus_wit(SECOND_DELAY);
 	GPIO_ResetBits(gpiox, SCL);
 	GPIO_ResetBits(gpiox, SDA);
 	return res;
@@ -94,9 +97,9 @@ unsigned char SlaveSend1Bit()
 void MainRecAck(unsigned char ack)
 {
 	if (ack) GPIO_SetBits(gpiox, SDA);
-	Delay_xus_wit(5);
+	Delay_xus_wit(FIST_DELAY);
 	GPIO_SetBits(gpiox, SCL);
-	Delay_xus_wit(4);
+	Delay_xus_wit(SECOND_DELAY);
 	GPIO_ResetBits(gpiox, SCL);
 	GPIO_ResetBits(gpiox, SDA);
 }
