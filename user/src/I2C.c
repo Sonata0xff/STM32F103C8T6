@@ -64,8 +64,8 @@ unsigned char SlaveRecAck()
 	GPIO_SetBits(gpiox, SDA);
 	Delay_xus_wit(FIST_DELAY);
 	GPIO_SetBits(gpiox, SCL);
+	Delay_xus_wit(SECOND_DELAY); 
 	res = GPIO_ReadInputDataBit(gpiox, SDA);
-	Delay_xus_wit(SECOND_DELAY);
 	GPIO_ResetBits(gpiox, SCL);
 	GPIO_ResetBits(gpiox, SDA);
 	return res;
