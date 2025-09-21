@@ -136,6 +136,19 @@ int main()
 		GPIO_SetBits(GPIOA, GPIO_Pin_12);
 		while(1);
 	}
+	
+	//en selfdefine
+	if (MainSend1Byte(0x00) != 0x00) {
+		GPIO_SetBits(GPIOA, GPIO_Pin_12);
+		while(1);
+	}
+	if (MainSend1Byte(0x18) != 0x00) {
+		GPIO_SetBits(GPIOA, GPIO_Pin_12);
+		while(1);
+	}
+	
+	//selfdefine
+	
 	if (MainSend1Byte(0x8d) != 0x00) {
 		GPIO_SetBits(GPIOA, GPIO_Pin_12);
 		while(1);
@@ -149,9 +162,10 @@ int main()
 		while(1);
 	}
 	EndFunc();
-	Delay_xms_wit(100);
+	Delay_xms_wit(500);
 	// start
 	StartFunc();
+	
 	//address send
 	if (MainSend1Byte(0x78) != 0x00) {
 		GPIO_SetBits(GPIOA, GPIO_Pin_12);
@@ -161,6 +175,38 @@ int main()
 	if (MainSend1Byte(0x40) != 0x00) {
 		GPIO_SetBits(GPIOA, GPIO_Pin_12);
 		while(1);
+	}
+	for(int z = 0;z < 1; z++) {
+		for (int i = 0;i < 64; i++) {
+		if (MainSend1Byte(0xf0) != 0x00) {
+			GPIO_SetBits(GPIOA, GPIO_Pin_12);
+			while(1);
+		}
+		Delay_xms_wit(5);
+	}
+	for (int i = 64;i < 128; i++) {
+		if (MainSend1Byte(0x0f) != 0x00) {
+			GPIO_SetBits(GPIOA, GPIO_Pin_12);
+			while(1);
+		}
+		Delay_xms_wit(5);
+	}
+	}
+	for (;;) {
+		for (int i = 0;i < 64; i++) {
+		if (MainSend1Byte(0x0f) != 0x00) {
+			GPIO_SetBits(GPIOA, GPIO_Pin_12);
+			while(1);
+		}
+		Delay_xms_wit(5);
+	}
+	for (int i = 64;i < 128; i++) {
+		if (MainSend1Byte(0xf0) != 0x00) {
+			GPIO_SetBits(GPIOA, GPIO_Pin_12);
+			while(1);
+		}
+		Delay_xms_wit(5);
+	}
 	}
 	//write data
 	for (int i = 0;i < 64; i++) {
