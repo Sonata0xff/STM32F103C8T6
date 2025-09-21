@@ -37,7 +37,7 @@ int main()
 		GPIO_SetBits(GPIOA, GPIO_Pin_12);
 		while(1);
 	}
-	if (MainSend1Byte(0x10) != 0x00) {
+	if (MainSend1Byte(0x00) != 0x00) {
 		GPIO_SetBits(GPIOA, GPIO_Pin_12);
 		while(1);
 	}
@@ -102,7 +102,7 @@ int main()
 		while(1);
 	}
 	//Set Pre-Charge Period
-	if (MainSend1Byte(0xf0) != 0x00) {
+	if (MainSend1Byte(0x80) != 0x00) {
 		GPIO_SetBits(GPIOA, GPIO_Pin_12);
 		while(1);
 	}
@@ -163,9 +163,19 @@ int main()
 		while(1);
 	}
 	//write data
-	if (MainSend1Byte(0x89) != 0x00) {
+	for (int i = 0;i < 64; i++) {
+		if (MainSend1Byte(0xf0) != 0x00) {
 			GPIO_SetBits(GPIOA, GPIO_Pin_12);
 			while(1);
+		}
+		Delay_xms_wit(5);
+	}
+	for (int i = 64;i < 128; i++) {
+		if (MainSend1Byte(0x0f) != 0x00) {
+			GPIO_SetBits(GPIOA, GPIO_Pin_12);
+			while(1);
+		}
+		Delay_xms_wit(5);
 	}
 	//end func
 	EndFunc();
