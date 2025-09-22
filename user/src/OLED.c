@@ -59,7 +59,7 @@ void TurnOffScreen()
 	if (ScreenOn == 0) return;
 	
 	StartFunc();//开始通讯
-	MainSend1Byte(0xaf);//关闭屏幕
+	MainSend1Byte(0xae);//关闭屏幕
 	EndFunc();//结束通讯
 	ScreenOn = 0;
 }
