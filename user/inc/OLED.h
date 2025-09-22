@@ -4,5 +4,13 @@
 #include "I2C.h"
 
 
+void InitOLED(GPIO_TypeDef* GPIOx, uint16_t SCL_, uint16_t SDA_);//初始化OLED系统的前置系统，
+unsigned char TurnOnScreen();//启动屏幕
+void FlashScreen();//清空屏幕
+void TurnOffScreen();//关闭屏幕
+void Write1Bit(unsigned char v128, unsigned char v64, unsigned char val);//写入1bit数据
+void write8x8Char(unsigned char v128, unsigned char v64, char* val);//写入一个8x8字符
+void Draw1Pic(unsigned char v128, unsigned char v64, char** pic, unsigned char hight, unsigned char width);//写入一张图片，右上起点
+
 
 #endif

@@ -1,2 +1,77 @@
 #include "OLED.h"
+unsigned char ScreenOn = 0;
+//初始化函数
+void InitOLED(GPIO_TypeDef* GPIOx, uint16_t SCL_, uint16_t SDA_)
+{
+	IIC_Init(GPIOx, SCL_, SDA_);
+}
+unsigned char TurnOnScreen()
+{
+	if (ScreenOn) return 0;
+	
+	StartFunc();//开始通讯
+	
+	if (MainSend1Byte(0x78) != 0x00) return 1;//发送设备地址
+	
+	if (MainSend1Byte(0x00) != 0x00) return 2;//发送控制字节
+	
+	if (MainSend1Byte(0xae) != 0x00) return 3;//关闭屏幕
+	
+	if (MainSend1Byte(0x20) != 0x00) return 4;//设置DDR寻址模式
+	if (MainSend1Byte(0x00) != 0x00) return 5;//设置为水平模式
+	
+	if (MainSend1Byte(0x81) != 0x00) return 6;//设置屏幕对比度
+	if (MainSend1Byte(0xff) != 0x00) return 7;//设置屏幕对比度为0xff
+	
+	if (MainSend1Byte(0xda) != 0x00) return 8;//设置交替行输出
+	if (MainSend1Byte(0x12) != 0x00) return 9;//设置为序列输出
+	
+	if (MainSend1Byte(0xb0) != 0x00) return 10;//设置起始页
+	
+	if (MainSend1Byte(0x00) != 0x00) return 11;//设置开始列的低四位
+	if (MainSend1Byte(0x10) != 0x00) return 12;//设置开始列的高四位
+	
+	if (MainSend1Byte(0x8d) != 0x00) return 13;//启动前标准流程1
+	if (MainSend1Byte(0x14) != 0x00) return 14;//启动前标准流程2
+	
+	if (MainSend1Byte(0xaf) != 0x00) return 13;//启动屏幕
+	EndFunc();//结束通讯
+	Delay_xms_wit(100);//延时100ms
+	ScreenOn = 1;
+	return 0;
+}
 
+void FlashScreen()
+{
+	if (ScreenOn == 0) return;
+	
+	StartFunc();//开始通讯
+	MainSend1Byte(0x78);//发送设备地址
+	MainSend1Byte(0x40);//发送控制字节
+	for (int i = 0; i < 128 * 8; i++) {
+		MainSend1Byte(0x00);//清空显示屏
+	}
+	EndFunc();//结束通讯
+}
+
+void TurnOffScreen()
+{
+	if (ScreenOn == 0) return;
+	
+	StartFunc();//开始通讯
+	MainSend1Byte(0xaf);//关闭屏幕
+	EndFunc();//结束通讯
+	ScreenOn = 0;
+}
+void Write1Bit(unsigned char v128, unsigned char v64, unsigned char val)
+{
+	
+}
+void write8x8Char(unsigned char v128, unsigned char v64, char* val)
+{
+	
+}
+void Draw1Pic(unsigned char v128, unsigned char v64, char** pic, unsigned char hight, unsigned char width)
+{
+	
+}
