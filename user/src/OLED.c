@@ -18,7 +18,7 @@ unsigned char TurnOnScreen()
 	if (MainSend1Byte(0xae) != 0x00) return 3;//关闭屏幕
 	
 	if (MainSend1Byte(0x20) != 0x00) return 4;//设置DDR寻址模式
-	if (MainSend1Byte(0x00) != 0x00) return 5;//设置为水平模式
+	if (MainSend1Byte(0x02) != 0x00) return 5;//设置为页模式
 	
 	if (MainSend1Byte(0x81) != 0x00) return 6;//设置屏幕对比度
 	if (MainSend1Byte(0xff) != 0x00) return 7;//设置屏幕对比度为0xff
@@ -41,17 +41,24 @@ unsigned char TurnOnScreen()
 	return 0;
 }
 
-void FlashScreen()
+void FlashScreen(unsigned char val)
 {
 	if (ScreenOn == 0) return;
 	
-	StartFunc();//开始通讯
-	MainSend1Byte(0x78);//发送设备地址
-	MainSend1Byte(0x40);//发送控制字节
-	for (int i = 0; i < 128 * 8; i++) {
-		MainSend1Byte(0x00);//清空显示屏
+	for (unsigned char i = 0xb0; i <= 0xb7; i++) {
+		StartFunc();//开始通讯
+		MainSend1Byte(0x78);//发送设备地址
+		MainSend1Byte(0x00);//发送控制字节
+		MainSend1Byte(i);//设置页地址
+		MainSend1Byte(0x00);//设置起始col
+		MainSend1Byte(0x10);//设置起始col
+		EndFunc();//结束通讯
+		StartFunc();//开始通讯
+		MainSend1Byte(0x78);//发送设备地址
+		MainSend1Byte(0x40);//发送数据字节
+		for (int j = 0; j < 128; j++) MainSend1Byte(val);//刷新称指定字符
+		EndFunc();//结束通讯
 	}
-	EndFunc();//结束通讯
 }
 
 void TurnOffScreen()
@@ -59,6 +66,8 @@ void TurnOffScreen()
 	if (ScreenOn == 0) return;
 	
 	StartFunc();//开始通讯
+	MainSend1Byte(0x78);//发送设备地址
+	MainSend1Byte(0x00);//发送控制字节
 	MainSend1Byte(0xae);//关闭屏幕
 	EndFunc();//结束通讯
 	ScreenOn = 0;
