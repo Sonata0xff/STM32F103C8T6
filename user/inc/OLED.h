@@ -8,9 +8,9 @@ void InitOLED(GPIO_TypeDef* GPIOx, uint16_t SCL_, uint16_t SDA_);//³õÊ¼»¯OLEDÏµÍ
 unsigned char TurnOnScreen();//Æô¶¯ÆÁÄ»
 void FlashScreen(unsigned char val);//Ë¢ĞÂÆÁÄ»³ÉÖ¸¶¨×Ö·û
 void TurnOffScreen();//¹Ø±ÕÆÁÄ»
-void Write1Bit(unsigned char v128, unsigned char v64, unsigned char val);//Ğ´Èë1bitÊı¾İ
-void write8x8Char(unsigned char v128, unsigned char v64, char* val);//Ğ´ÈëÒ»¸ö8x8×Ö·û
-void Draw1Pic(unsigned char v128, unsigned char v64, char** pic, unsigned char hight, unsigned char width);//Ğ´ÈëÒ»ÕÅÍ¼Æ¬£¬ÓÒÉÏÆğµã
+void Write1Byte(unsigned char v128, unsigned char v64, unsigned char val);//Ğ´Èë1byteÊı¾İ
+void write8x8Char(unsigned char v128, unsigned char v8, unsigned char val[]);//Ğ´ÈëÒ»¸ö8x8×Ö·û
+void Draw1Pic(unsigned char v128, unsigned char v8, char** pic, unsigned char hight, unsigned char width);//Ğ´ÈëÒ»ÕÅÍ¼Æ¬£¬ÓÒÉÏÆğµã
 
 
 #endif

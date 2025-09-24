@@ -72,15 +72,70 @@ void TurnOffScreen()
 	EndFunc();//结束通讯
 	ScreenOn = 0;
 }
-void Write1Bit(unsigned char v128, unsigned char v64, unsigned char val)
+void Write1Byte(unsigned char v128, unsigned char v8, unsigned char val)
 {
-	
+	if (ScreenOn == 0) return;
+	if (v128 >= 128 || v8 >= 8) return;
+	v8 += 0xb0;
+	unsigned char upHalf = ((v128 >> 4) + 0x10);
+	unsigned char downHalf = v128 & 0x0f;
+	StartFunc();//开始通讯
+	MainSend1Byte(0x78);//发送设备地址
+	MainSend1Byte(0x00);//发送控制字节
+	MainSend1Byte(v8);//设置页地址
+	MainSend1Byte(downHalf);//设置列地址低位
+	MainSend1Byte(upHalf);//设置列地址高位
+	EndFunc();//结束通讯
+	StartFunc();//开始通讯
+	MainSend1Byte(0x78);//发送设备地址
+	MainSend1Byte(0x40);//发送数据字节
+	MainSend1Byte(val);//发送数据
+	EndFunc();//结束通讯
 }
-void write8x8Char(unsigned char v128, unsigned char v64, char* val)
+void write8x8Char(unsigned char v128, unsigned char v8, unsigned char val[])
 {
-	
+	if (ScreenOn == 0) return;
+	if (v128 >= 128 || v8 >= 8) return;
+	v8 += 0xb0;
+	unsigned char upHalf = ((v128 >> 4) + 0x10);
+	unsigned char downHalf = v128 & 0x0f;
+	StartFunc();//开始通讯
+	MainSend1Byte(0x78);//发送设备地址
+	MainSend1Byte(0x00);//发送控制字节
+	MainSend1Byte(v8);//设置页地址
+	MainSend1Byte(downHalf);//设置列地址低位
+	MainSend1Byte(upHalf);//设置列地址高位
+	EndFunc();//结束通讯
+	StartFunc();//开始通讯
+	MainSend1Byte(0x78);//发送设备地址
+	MainSend1Byte(0x40);//发送数据字节
+	for (unsigned char i = 0; i < 8; i++) MainSend1Byte(val[i]);//发送数据
+	EndFunc();//结束通讯
 }
-void Draw1Pic(unsigned char v128, unsigned char v64, char** pic, unsigned char hight, unsigned char width)
+/*
+pic format:[row][col]
+x x x x x
+y y y y y
+z z z z z
+*/
+void Draw1Pic(unsigned char v128, unsigned char v8, char** pic, unsigned char hight, unsigned char width)
 {
-	
+	if (ScreenOn == 0) return;
+	if (v128 + width - 1 >= 128 || v8 + hight - 1 >= 8) return;
+	unsigned char upHalf = ((v128 >> 4) + 0x10);
+	unsigned char downHalf = v128 & 0x0f;
+	for (unsigned char i = 0; i < hight; i++) {
+		StartFunc();
+		MainSend1Byte(0x78);
+		MainSend1Byte(0x00);
+		MainSend1Byte(v8 + i - 1 + 0xb0);//设置页地址
+		MainSend1Byte(downHalf);//设置列地址低位
+		MainSend1Byte(upHalf);//设置列地址高位
+		EndFunc();
+		StartFunc();
+		MainSend1Byte(0x78);
+		MainSend1Byte(0x40);//发送数据字节
+		for (unsigned char j = 0; j < width; j++) MainSend1Byte(pic[i][j]);//写入数据
+		EndFunc();
+	}
 }
