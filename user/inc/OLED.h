@@ -10,7 +10,7 @@ void FlashScreen(unsigned char val);//刷新屏幕成指定字符
 void TurnOffScreen();//关闭屏幕
 void Write1Byte(unsigned char v128, unsigned char v64, unsigned char val);//写入1byte数据
 void write8x8Char(unsigned char v128, unsigned char v8, unsigned char val[]);//写入一个8x8字符
-void Draw1Pic(unsigned char v128, unsigned char v8, char** pic, unsigned char hight, unsigned char width);//写入一张图片，右上起点
+void Draw1Pic(unsigned char v128, unsigned char v8, unsigned char *pic, unsigned char hight, unsigned char width);//写入一张图片，右上起点
 
 
 #endif

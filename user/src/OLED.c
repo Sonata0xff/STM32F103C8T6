@@ -118,7 +118,7 @@ x x x x x
 y y y y y
 z z z z z
 */
-void Draw1Pic(unsigned char v128, unsigned char v8, char** pic, unsigned char hight, unsigned char width)
+void Draw1Pic(unsigned char v128, unsigned char v8, unsigned char *pic, unsigned char hight, unsigned char width)
 {
 	if (ScreenOn == 0) return;
 	if (v128 + width - 1 >= 128 || v8 + hight - 1 >= 8) return;
@@ -135,7 +135,7 @@ void Draw1Pic(unsigned char v128, unsigned char v8, char** pic, unsigned char hi
 		StartFunc();
 		MainSend1Byte(0x78);
 		MainSend1Byte(0x40);//发送数据字节
-		for (unsigned char j = 0; j < width; j++) MainSend1Byte(pic[i][j]);//写入数据
+		for (unsigned char j = 0; j < width; j++) MainSend1Byte(*(pic + i*hight + j));//写入数据
 		EndFunc();
 	}
 }
