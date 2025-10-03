@@ -9,6 +9,11 @@
     5.EXTI_Init初始化外部中断，中断具体配置见入参EXTI_InitTypeDef配置
     6.NVIC_PriorityGroupConfig配置中断优先级策略，一共四种
     7.NVIC_Init初始化中断，具体配置见入参NVIC_InitTypeDef配置
+(3)定时器调用流程：
+1.GPIOx -> AFIO -> EXTI+中断事件控制 -> 中断 -> NVIC
+                 /              \
+   PVD,RTC,USB,ETH                 事件 -> 外部设备
+
 以下为一个样例代码，其中GPIOA_Pin_0作为输出端，连接LED。GPIOB_Pin_5作为中断发起端口，连接一个按钮。
 当按钮被按下时，PB5引脚被拉低，下降沿触发中断，中断函数通过设置PA0引脚来改变LED的亮灭：
 主进程代码：
