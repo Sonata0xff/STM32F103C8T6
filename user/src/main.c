@@ -40,20 +40,16 @@ int main()
 		.TIM_ICFilter = 1
 	};
 	TIM_ICInit(TIM1, &ic_config);
-	TIM_ITConfig(TIM1, TIM_IT_CC1, ENABLE);
-	/*NVIC init*/
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-	NVIC_InitTypeDef nvic_config = {
-		.NVIC_IRQChannel = TIM1_CC_IRQn,
-		.NVIC_IRQChannelPreemptionPriority = 1,
-		.NVIC_IRQChannelSubPriority = 1,
-		.NVIC_IRQChannelCmd = ENABLE
-	};
-	NVIC_Init(&nvic_config);
+	TIM_SelectInputTrigger(TIM1, TIM_TS_TI1FP1);
+	TIM_SelectSlaveMode(TIM1, TIM_SlaveMode_Reset);
 	/*Start func*/
-	
 	TIM_CCxCmd(TIM1, TIM_Channel_1, TIM_CCx_Enable);
 	TIM_Cmd(TIM1, ENABLE);
-	while(1);
+	while(1) {
+		if (TIM_GetFlagStatus(TIM1, TIM_FLAG_Trigger) == RESET) continue;
+		else TIM_ClearFlag(TIM1, TIM_FLAG_Trigger);
+		if (TIM_GetCapture1(TIM1) == 1000) GPIO_SetBits(GPIOA, GPIO_Pin_0);
+		else GPIO_ResetBits(GPIOA, GPIO_Pin_0);
+	}
 	return 0;
 }
