@@ -5,51 +5,44 @@
 #include "head.h"
 int main()
 {
-	/*GPIO outport init*/
+	/*get pwm value*/
+	uint16_t timer_period_us = 1000;
+	float emp_precent = 0.5;
+	uint16_t wholePeriod = (uint16_t)(timer_period_us / 2);
+	uint16_t lowPeriod = (uint16_t)(wholePeriod * emp_precent);
+	/*init outport gpio*/
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-	GPIO_InitTypeDef gpioA0_config = {
-		.GPIO_Pin = GPIO_Pin_0,
-		.GPIO_Speed = GPIO_Speed_50MHz,
-		.GPIO_Mode = GPIO_Mode_Out_PP
-	};
-	GPIO_Init(GPIOA, &gpioA0_config);
-	GPIO_SetBits(GPIOA, GPIO_Pin_0);
-	/*GPIO remap inputport init*/
-	GPIO_InitTypeDef input_port_config = {
+	GPIO_InitTypeDef outport_config = {
 		.GPIO_Pin = GPIO_Pin_8,
 		.GPIO_Speed = GPIO_Speed_50MHz,
-		.GPIO_Mode = GPIO_Mode_IN_FLOATING
+		.GPIO_Mode = GPIO_Mode_AF_PP
 	};
-	GPIO_Init(GPIOA, &input_port_config);
-	/*TIM1 init*/
+	GPIO_Init(GPIOA, &outport_config);
+	/*init timer1*/
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
 	TIM_InternalClockConfig(TIM1);
 	TIM_TimeBaseInitTypeDef base_config = {
-		.TIM_Prescaler = 71,
-		.TIM_CounterMode = TIM_CounterMode_Up,
-		.TIM_Period = 10000,
+		.TIM_Prescaler = 72 - 1,
+		.TIM_CounterMode = TIM_CounterMode_CenterAligned1,
+		.TIM_Period = wholePeriod,
 		.TIM_ClockDivision = TIM_CKD_DIV2,
 		.TIM_RepetitionCounter = 0
 	};
 	TIM_TimeBaseInit(TIM1, &base_config);
-	TIM_ICInitTypeDef ic_config = {
-		.TIM_Channel = TIM_Channel_1,
-		.TIM_ICPolarity = TIM_ICPolarity_Rising,
-		.TIM_ICSelection = TIM_ICSelection_DirectTI,
-		.TIM_ICPrescaler = TIM_ICPSC_DIV1,
-		.TIM_ICFilter = 1
+	TIM_OCInitTypeDef oc_config = {
+		.TIM_OCMode = TIM_OCMode_Toggle,
+		.TIM_OutputState = TIM_OutputState_Enable,
+		.TIM_OutputNState = TIM_OutputNState_Disable,
+		.TIM_Pulse = lowPeriod,
+		.TIM_OCPolarity = TIM_OCPolarity_High,
+		.TIM_OCNPolarity = TIM_OCNPolarity_High,
+		.TIM_OCIdleState = TIM_OCIdleState_Reset,
+		.TIM_OCNIdleState = TIM_OCNIdleState_Reset
 	};
-	TIM_ICInit(TIM1, &ic_config);
-	TIM_SelectInputTrigger(TIM1, TIM_TS_TI1FP1);
-	TIM_SelectSlaveMode(TIM1, TIM_SlaveMode_Reset);
-	/*Start func*/
-	TIM_CCxCmd(TIM1, TIM_Channel_1, TIM_CCx_Enable);
+	TIM_CtrlPWMOutputs(TIM1, ENABLE);
+	TIM_OC1Init(TIM1, &oc_config);
+	/*start system*/
 	TIM_Cmd(TIM1, ENABLE);
-	while(1) {
-		if (TIM_GetFlagStatus(TIM1, TIM_FLAG_Trigger) == RESET) continue;
-		else TIM_ClearFlag(TIM1, TIM_FLAG_Trigger);
-		if (TIM_GetCapture1(TIM1) == 1000) GPIO_SetBits(GPIOA, GPIO_Pin_0);
-		else GPIO_ResetBits(GPIOA, GPIO_Pin_0);
-	}
+	while(1);
 	return 0;
 }
