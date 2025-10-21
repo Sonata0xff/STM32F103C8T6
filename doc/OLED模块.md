@@ -75,3 +75,21 @@
     1.0xe3：无操作
 
 
+关于OLED代码的使用方案：
+(1)注意：I2C模块将使用TIM2定时器定时，请勿使用该定时器用于其它模块
+(2)初始化流程：
+    1.OLED模块头文件：OLED.h
+    2.TimerInitWithOutIT();//初始化定时器，非中断定时
+    3.RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE);//启动GPIOA
+    4.uint16_t SCL = GPIO_Pin_11;
+	 uint16_t SDA = GPIO_Pin_12;//指定GPIO端口作为SCL与SDA线
+    5.InitOLED(GPIOA, SCL, SDA);//初始化OLED屏幕
+    6.TurnOnScreen();//启动屏幕
+    7.FlashScreen(0x00);//刷新屏幕为全空
+(3)写入显示：
+    1.WirteIn16x8Char//写入一个16x8大小的字符
+    2.WriteIn16x8String//写入一个字符串，写满行时自动换行，写到尾部时，自动抛弃多余字符
+(4)关闭显示：
+    1.TurnOffScreen();//关闭屏幕
+	
+	
