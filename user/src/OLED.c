@@ -372,7 +372,7 @@ void WirteIn16x8Char(unsigned char v128, unsigned char v8, char val)
 }
 
 
-void WriteIn16x8String(unsigned char v128, unsigned char v8, int len, unsigned char val[])
+void WriteIn16x8String(unsigned char v128, unsigned char v8, int len, char val[])
 {
 	if (ScreenOn == 0) return;
 	if (v8 >= 4 || v128 >= 16) return;

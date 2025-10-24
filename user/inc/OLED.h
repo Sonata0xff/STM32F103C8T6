@@ -13,6 +13,6 @@ void write8x8Char(unsigned char v128, unsigned char v8, unsigned char val[]);//Ğ
 void Draw1Pic(unsigned char v128, unsigned char v8, unsigned char *pic, unsigned char hight, unsigned char width);//Ğ´ÈëÒ»ÕÅÍ¼Æ¬£¬ÓÒÉÏÆğµã
 //v128Ö¸ÁĞ£¬È¡Öµ·¶Î§:0~15¡£v8Ö¸ĞĞ£¬È¡Öµ·¶Î§:0~3¡£µ¥¸ö×Ö·û´óĞ¡£º16ĞĞ³Ë8ÁĞ
 void WirteIn16x8Char(unsigned char v128, unsigned char v8, char val);//Ğ´ÈëÒ»¸ö×Ö·û
-void WriteIn16x8String(unsigned char v128, unsigned char v8, int len, unsigned char val[]);//Ğ´Èë×Ö·û´®,ĞĞĞ´Âú×Ô¶¯»»ĞĞ£¬È«²¿Ğ´Âú×Ô¶¯Í£Ö¹£¬ÆäÓà×Ô¶¯¶ªÆú
+void WriteIn16x8String(unsigned char v128, unsigned char v8, int len, char val[]);//Ğ´Èë×Ö·û´®,ĞĞĞ´Âú×Ô¶¯»»ĞĞ£¬È«²¿Ğ´Âú×Ô¶¯Í£Ö¹£¬ÆäÓà×Ô¶¯¶ªÆú
 
 #endif
