@@ -21,7 +21,21 @@ int main()
 	u8 src[5] = {0x00, 0x00, 0x00, 0x00, 0x00};
 	u8 dst[5] = {0xff, 0xff, 0xff, 0xff, 0xff};
 	//DMA初始化
-	
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
+	DMA_InitTypeDef dma_config = {
+		.DMA_PeripheralBaseAddr = (uint32_t)dst,
+		.DMA_MemoryBaseAddr = (uint32_t)src,
+		.DMA_DIR = DMA_DIR_PeripheralDST,
+		.DMA_BufferSize = 5,
+		.DMA_PeripheralInc = DMA_PeripheralInc_Enable,
+		.DMA_MemoryInc = DMA_PeripheralInc_Enable,
+		.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
+		.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte,
+		.DMA_Mode = DMA_Mode_Normal,
+		.DMA_Priority = DMA_Priority_VeryHigh,
+		.DMA_M2M = DMA_M2M_Enable
+	};
+	DMA_Init(DMA1_Channel1, &dma_config);
 	//开始搬运
 	char bufChar[2];
 	while(1) {
@@ -31,15 +45,20 @@ int main()
 		}
 		Delay_xms_wit(2000);
 		//DMA转移数据
-		
+		DMA_SetCurrDataCounter(DMA1_Channel1, 5);
+		DMA_Cmd(DMA1_Channel1, ENABLE);
+		while(DMA_GetCurrDataCounter(DMA1_Channel1));
+		DMA_Cmd(DMA1_Channel1, DISABLE);
 		//oled显示
 		for (unsigned char i = 0; i < 5; i++) {
 			Uint8toStr(src[i], bufChar);
 			WriteIn16x8String(i * 3, 1, 2, bufChar);
+		}
+		Delay_xms_wit(2000);
+		for (unsigned char i = 0; i < 5; i++) {
 			Uint8toStr(dst[i], bufChar);
 			WriteIn16x8String(i * 3, 3, 2, bufChar);
 		}
-		Delay_xms_wit(2000);
 	}
 	return 0;
 }
