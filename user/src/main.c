@@ -18,8 +18,8 @@ int main()
 	WriteIn16x8String(0, 0, 4, title1);
 	WriteIn16x8String(0, 2, 4, title2);
 	//设置目标地址与源地址数组，并在old上显示
-	u8 src[5] = {0x00};
-	u8 dst[5] = {0xff};
+	u8 src[5] = {0x00, 0x00, 0x00, 0x00, 0x00};
+	u8 dst[5] = {0xff, 0xff, 0xff, 0xff, 0xff};
 	//DMA初始化
 	
 	//开始搬运
