@@ -86,4 +86,59 @@
 使能或者失能ADCx软件启动注入组转换功能
 
 
-模板代码稍后将进入
+二、adc模块的模板代码：
+场景：外部将从PA0输入一个0~3.3V的电压信号，并将对应的结果输出至oled屏幕。
+#include "stm32f10x.h"                  // Device header
+#include "timer.h"
+#include "I2C.h"
+#include "OLED.h"
+#include "head.h"
+int main()
+{
+	//oledc³õÊ¼»¯
+	char title[] = "ADC_VAL:";
+	TimerInitWithOutIT();
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+	uint16_t SCL = GPIO_Pin_11;
+	uint16_t SDA = GPIO_Pin_12;
+	InitOLED(GPIOA, SCL, SDA);
+	TurnOnScreen();
+	FlashScreen(0x00);
+	WriteIn16x8String(0, 0, 8, title);
+	//adc gpio init
+	GPIO_InitTypeDef adc_port = {
+		.GPIO_Pin = GPIO_Pin_0,
+		.GPIO_Speed = GPIO_Speed_50MHz,
+		.GPIO_Mode = GPIO_Mode_AIN //Ä£ÄâÊäÈë
+	};
+	GPIO_Init(GPIOA, &adc_port);
+	//adc init
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);//´ò¿ªÍâÉèÊ±ÖÓ
+	RCC_ADCCLKConfig(RCC_PCLK2_Div6);//ÅäÖÃADCÔ¤·ÖÆµÆ÷,12Mhz
+	ADC_InitTypeDef adc_config = {
+		.ADC_Mode = ADC_Mode_Independent,
+		.ADC_ScanConvMode = DISABLE,
+		.ADC_ContinuousConvMode = DISABLE,
+		.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None,
+		.ADC_DataAlign = ADC_DataAlign_Right,
+		.ADC_NbrOfChannel = 1
+	};
+	ADC_Init(ADC1, &adc_config);
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_0, 1, ADC_SampleTime_55Cycles5);
+	ADC_Cmd(ADC1, ENABLE);//ADCÆô¶¯
+	ADC_StartCalibration(ADC1);//Æô¶¯Ð£×¼³ÌÐò
+	while(ADC_GetCalibrationStatus(ADC1) == SET);//µÈ´ýÐ£×¼Íê³É
+	//chars write in
+	u16 adc_value = 0;
+	char str[5];
+	while (1) {
+		//adc_value = Get_ADC_VALUE();
+		ADC_SoftwareStartConvCmd(ADC1, ENABLE);//Èí¼þ´¥·¢×ª»»
+		while(ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == RESET);//µÈ´ý×ª»»Íê³É
+		adc_value = ADC_GetConversionValue(ADC1);//»ñÈ¡×ª»¯Öµ
+		words2Str(adc_value, str);
+		WriteIn16x8String(8, 0, 5, str);
+		Delay_xms_wit(500);
+	}
+	return 0;
+}
