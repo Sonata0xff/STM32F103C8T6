@@ -3,11 +3,11 @@
 #include "I2C.h"
 #include "OLED.h"
 #include "head.h"
+
 int main()
 {
 	//oledc初始化
-	char title1[] = "src:";
-	char title2[] = "dst:";
+	char title1[] = "rec:";
 	TimerInitWithOutIT();
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
 	uint16_t SCL = GPIO_Pin_11;
@@ -16,49 +16,57 @@ int main()
 	TurnOnScreen();
 	FlashScreen(0x00);
 	WriteIn16x8String(0, 0, 4, title1);
-	WriteIn16x8String(0, 2, 4, title2);
-	//设置目标地址与源地址数组，并在old上显示
-	u8 src[5] = {0x00, 0x00, 0x00, 0x00, 0x00};
-	u8 dst[5] = {0xff, 0xff, 0xff, 0xff, 0xff};
-	//DMA初始化
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
-	DMA_InitTypeDef dma_config = {
-		.DMA_PeripheralBaseAddr = (uint32_t)dst,
-		.DMA_MemoryBaseAddr = (uint32_t)src,
-		.DMA_DIR = DMA_DIR_PeripheralDST,
-		.DMA_BufferSize = 5,
-		.DMA_PeripheralInc = DMA_PeripheralInc_Enable,
-		.DMA_MemoryInc = DMA_PeripheralInc_Enable,
-		.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
-		.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte,
-		.DMA_Mode = DMA_Mode_Normal,
-		.DMA_Priority = DMA_Priority_VeryHigh,
-		.DMA_M2M = DMA_M2M_Enable
+	//设置目标地址与源地址数组，并在oled上显示
+	
+	//GPIO初始化 for USART
+	GPIO_InitTypeDef tx_config = {
+		.GPIO_Pin = GPIO_Pin_2,
+		.GPIO_Speed = GPIO_Speed_50MHz,
+		.GPIO_Mode = GPIO_Mode_AF_PP
 	};
-	DMA_Init(DMA1_Channel1, &dma_config);
-	//开始搬运
-	char bufChar[2];
-	while(1) {
-		for (unsigned char i = 0; i < 5; i++) {
-			if (src[i] == 0xff) src[i] = 0x00;
-			else src[i] += 1;
+	GPIO_InitTypeDef rx_coonfiig = {
+		.GPIO_Pin = GPIO_Pin_3,
+		.GPIO_Speed = GPIO_Speed_50MHz,
+		.GPIO_Mode = GPIO_Mode_IN_FLOATING
+	};
+	GPIO_Init(GPIOA, &tx_config);
+	GPIO_Init(GPIOA, &rx_coonfiig);
+	
+	//USART初始化
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
+	USART_InitTypeDef usartConfig = {
+		.USART_BaudRate = 9600,
+		.USART_WordLength = USART_WordLength_8b,
+		.USART_StopBits = USART_StopBits_1,
+		.USART_Parity = USART_Parity_No,
+		.USART_Mode = (USART_Mode_Rx | USART_Mode_Tx),
+		.USART_HardwareFlowControl = USART_HardwareFlowControl_None
+	};
+	USART_Init(USART2, &usartConfig);
+	USART_SetPrescaler(USART2, 1);
+	//USART_ITConfig(USART2, USART_IT_TC, ENABLE);
+	USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+	NVIC_InitTypeDef usart_it = {
+		.NVIC_IRQChannel = USART2_IRQn,
+		.NVIC_IRQChannelPreemptionPriority = 1,
+		.NVIC_IRQChannelSubPriority = 1,
+		.NVIC_IRQChannelCmd = ENABLE
+	};
+	NVIC_Init(&usart_it);
+	//USART启动
+	USART_Cmd(USART2, ENABLE);
+	
+	//业务代码
+	while(1){
+		char res = GetUSARTValue();
+		WirteIn16x8Char(4, 0, res);
+		Delay_xms_wit(500);
+		if (USART_GetFlagStatus(USART2, USART_FLAG_TC) == SET) {
+			USART_SendData(USART2, res);
 		}
-		Delay_xms_wit(2000);
-		//DMA转移数据
-		DMA_SetCurrDataCounter(DMA1_Channel1, 5);
-		DMA_Cmd(DMA1_Channel1, ENABLE);
-		while(DMA_GetCurrDataCounter(DMA1_Channel1));
-		DMA_Cmd(DMA1_Channel1, DISABLE);
-		//oled显示
-		for (unsigned char i = 0; i < 5; i++) {
-			Uint8toStr(src[i], bufChar);
-			WriteIn16x8String(i * 3, 1, 2, bufChar);
-		}
-		Delay_xms_wit(2000);
-		for (unsigned char i = 0; i < 5; i++) {
-			Uint8toStr(dst[i], bufChar);
-			WriteIn16x8String(i * 3, 3, 2, bufChar);
-		}
-	}
+	};
+	
+	
 	return 0;
 }

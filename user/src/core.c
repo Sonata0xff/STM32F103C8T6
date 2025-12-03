@@ -19,3 +19,15 @@ void Uint8toStr(u8 value, char str[2])
 	str[1] = low;
 	return;
 }
+
+//usart comm value buff
+char USART_value = '#';
+char GetUSARTValue()
+{
+	return USART_value;
+}
+
+void USART2_IRQHandler()
+{
+	USART_value = USART_ReceiveData(USART2);
+}

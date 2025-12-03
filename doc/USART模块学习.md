@@ -54,4 +54,70 @@
 
 
 示例代码：
-实现接收器和发送器，每次接收一帧数据，然后将该数据通过USART回传回上位机，以及写入OLED.
+实现接收器和发送器，每次接收一帧数据，然后将该数据通过USART回传回上位机，以及写入OLED.大约每500ms回传一次数据.并将接收结果刷新到OLED中
+int main()
+{
+	//oledc³õÊ¼»¯
+	char title1[] = "rec:";
+	TimerInitWithOutIT();
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+	uint16_t SCL = GPIO_Pin_11;
+	uint16_t SDA = GPIO_Pin_12;
+	InitOLED(GPIOA, SCL, SDA);
+	TurnOnScreen();
+	FlashScreen(0x00);
+	WriteIn16x8String(0, 0, 4, title1);
+	//ÉèÖÃÄ¿±êµØÖ·ÓëÔ´µØÖ·Êý×é£¬²¢ÔÚoledÉÏÏÔÊ¾
+	
+	//GPIO³õÊ¼»¯ for USART
+	GPIO_InitTypeDef tx_config = {
+		.GPIO_Pin = GPIO_Pin_2,
+		.GPIO_Speed = GPIO_Speed_50MHz,
+		.GPIO_Mode = GPIO_Mode_AF_PP
+	};
+	GPIO_InitTypeDef rx_coonfiig = {
+		.GPIO_Pin = GPIO_Pin_3,
+		.GPIO_Speed = GPIO_Speed_50MHz,
+		.GPIO_Mode = GPIO_Mode_IN_FLOATING
+	};
+	GPIO_Init(GPIOA, &tx_config);
+	GPIO_Init(GPIOA, &rx_coonfiig);
+	
+	//USART³õÊ¼»¯
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
+	USART_InitTypeDef usartConfig = {
+		.USART_BaudRate = 9600,
+		.USART_WordLength = USART_WordLength_8b,
+		.USART_StopBits = USART_StopBits_1,
+		.USART_Parity = USART_Parity_No,
+		.USART_Mode = (USART_Mode_Rx | USART_Mode_Tx),
+		.USART_HardwareFlowControl = USART_HardwareFlowControl_None
+	};
+	USART_Init(USART2, &usartConfig);
+	USART_SetPrescaler(USART2, 1);
+	//USART_ITConfig(USART2, USART_IT_TC, ENABLE);
+	USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+	NVIC_InitTypeDef usart_it = {
+		.NVIC_IRQChannel = USART2_IRQn,
+		.NVIC_IRQChannelPreemptionPriority = 1,
+		.NVIC_IRQChannelSubPriority = 1,
+		.NVIC_IRQChannelCmd = ENABLE
+	};
+	NVIC_Init(&usart_it);
+	//USARTÆô¶¯
+	USART_Cmd(USART2, ENABLE);
+	
+	//ÒµÎñ´úÂë
+	while(1){
+		char res = GetUSARTValue();
+		WirteIn16x8Char(4, 0, res);
+		Delay_xms_wit(500);
+		if (USART_GetFlagStatus(USART2, USART_FLAG_TC) == SET) {
+			USART_SendData(USART2, res);
+		}
+	};
+	
+	
+	return 0;
+}
